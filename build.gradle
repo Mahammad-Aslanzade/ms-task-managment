@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'groovy'
 	id 'org.springframework.boot' version '3.3.1'
 	id 'io.spring.dependency-management' version '1.1.5'
 }
@@ -35,6 +36,18 @@ dependencies {
 
 	implementation 'org.mapstruct:mapstruct:1.5.1.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Spock Framework
+	testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
+	// Groovy
+	testImplementation 'org.codehaus.groovy:groovy-all:3.0.9'
+	// JUnit (optional, if you need to integrate with JUnit)
+	testImplementation 'junit:junit:4.13.2'
+	// Spock Mocking capabilities (optional)
+	testImplementation 'org.spockframework:spock-spring:2.3-groovy-3.0' // for spring support if needed
+	testImplementation 'org.spockframework:spock-guice:2.3-groovy-3.0' // for guice support if needed
+
+	implementation 'io.github.benas:random-beans:3.7.0'
 }
 
 tasks.named('test') {

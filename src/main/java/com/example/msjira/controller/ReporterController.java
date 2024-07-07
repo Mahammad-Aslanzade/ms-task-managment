@@ -5,9 +5,11 @@ import com.example.msjira.model.reporter.ReporterDto;
 import com.example.msjira.service.ReporterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/reporter")
