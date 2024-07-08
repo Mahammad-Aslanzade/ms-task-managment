@@ -21,6 +21,7 @@ public class TaskDto {
     private TaskStatus status;
     private Date createdAt;
     private Date updatedAt;
+    private Date deadline;
 
 
 }

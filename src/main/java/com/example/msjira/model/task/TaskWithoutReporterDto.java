@@ -19,4 +19,5 @@ public class TaskWithoutReporterDto {
     private TaskStatus status;
     private Date createdAt;
     private Date updatedAt;
+    private Date deadline;
 }

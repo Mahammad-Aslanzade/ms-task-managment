@@ -60,6 +60,7 @@ public class TaskService {
                         )
                 );
     }
+
     private ReporterEntity findReporter(String reporterId){
         return reporterRepository.findById(reporterId)
                 .orElseThrow(() ->
@@ -79,6 +80,8 @@ public class TaskService {
         if(taskReqDto.getAssigneeId() != null){
             TeleSalesEntity asignee = findTeleSale(taskReqDto.getAssigneeId());
             taskEntity.setAssignee(asignee);
+        }else{
+
         }
 
         // task entity settings
@@ -90,7 +93,6 @@ public class TaskService {
         log.info("ACTION.createTask.end reqBody : {}", taskReqDto);
     }
 
-    //processing .....
     public void updateTask(String taskId , TaskReqDto taskReqDto){
         log.info("ACTION.updateTask.start reqBody : {}", taskReqDto);
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(()->
@@ -102,7 +104,6 @@ public class TaskService {
         TaskEntity updatedTaskEntity = taskMapper.mapToEntity(taskReqDto);
         updatedTaskEntity.setId(taskEntity.getId());
         updatedTaskEntity.setCreatedAt(taskEntity.getCreatedAt());
-
 
         TeleSalesEntity assignee = taskEntity.getAssignee();
 
@@ -118,5 +119,11 @@ public class TaskService {
         taskRepository.save(updatedTaskEntity);
 
         log.info("ACTION.updateTask.end reqBody : {}", taskReqDto);
+    }
+
+    public void deleteTask(String taskId) {
+        log.info("ACTION.deleteTask.start taskId : {}",taskId);
+        taskRepository.deleteById(taskId);
+        log.info("ACTION.deleteTask.end taskId : {}",taskId);
     }
 }

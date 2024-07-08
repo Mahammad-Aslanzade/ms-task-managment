@@ -23,6 +23,7 @@ public class TaskEntity {
     private String description;
     private Date createdAt;
     private Date updatedAt;
+    private Date deadline;
 
     @ManyToOne
     @JoinColumn(name = "asignee_id")
