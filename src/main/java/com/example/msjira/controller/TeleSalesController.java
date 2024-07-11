@@ -3,6 +3,7 @@ package com.example.msjira.controller;
 import com.example.msjira.model.teleSales.TeleSaleDto;
 import com.example.msjira.model.teleSales.TeleSaleReqDto;
 import com.example.msjira.service.TeleSalesService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +27,12 @@ public class TeleSalesController {
     }
 
     @PostMapping
-    public void createTeleSale(@RequestBody TeleSaleReqDto teleSaleReqDto){
+    public void createTeleSale(@Valid @RequestBody TeleSaleReqDto teleSaleReqDto){
         teleSalesService.createTeleSale(teleSaleReqDto);
     }
 
     @PutMapping("/{teleSaleId}")
-    public void updateTeleSale(@PathVariable String teleSaleId , @RequestBody TeleSaleReqDto teleSaleReqDto){
+    public void updateTeleSale(@PathVariable String teleSaleId ,@Valid @RequestBody TeleSaleReqDto teleSaleReqDto){
         teleSalesService.updateTeleSale(teleSaleId , teleSaleReqDto);
     }
 

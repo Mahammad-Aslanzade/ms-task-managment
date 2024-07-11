@@ -1,6 +1,7 @@
 package com.example.msjira.model.task;
 
 
+import com.example.msjira.enums.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,6 @@ public class TaskReqDto {
     private String assigneeId;
     @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deadline;
+    private TaskStatus status;
 
 }

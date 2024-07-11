@@ -16,6 +16,7 @@ public class TeleSaleDto {
     private String id;
     private String name;
     private String surname;
+    private String email;
     private TeleSalePosition position;
     private LocalDate birthDate;
     private String image;

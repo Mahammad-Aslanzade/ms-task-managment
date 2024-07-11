@@ -14,20 +14,20 @@ import com.example.msjira.model.task.TaskDto;
 import com.example.msjira.model.task.TaskReqDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TaskService {
 
-    private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
+    private final TaskRepository taskRepository;
     private final ReporterRepository reporterRepository;
     private final TeleSalesRepository teleSalesRepository;
 
@@ -39,36 +39,58 @@ public class TaskService {
         return taskDtos;
     }
 
-    public TaskDto getTaskById(String taskId){
+    public TaskDto getTaskById(String taskId) {
         log.info("ACTION.getTaskById.start taskId : {}", taskId);
-        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(()->
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() ->
                 new NotFoundException(
                         ExceptionMessages.TASK_NOT_FOUND.message(),
-                        ExceptionMessages.TASK_NOT_FOUND.createLog("findTaskById" , taskId)
+                        ExceptionMessages.TASK_NOT_FOUND.createLog("findTaskById", taskId)
                 ));
         TaskDto taskDto = taskMapper.mapToDto(taskEntity);
-        log.info("ACTION.getTaskById.start taskId : {}" , taskId);
+        log.info("ACTION.getTaskById.start taskId : {}", taskId);
         return taskDto;
     }
 
-    private TeleSalesEntity findTeleSale(String teleSalesId){
+    private TeleSalesEntity findTeleSale(String teleSalesId) {
         return teleSalesRepository.findById(teleSalesId)
                 .orElseThrow(() ->
                         new NotFoundException(
                                 ExceptionMessages.TELESALE_NOT_FOUND.message(),
-                                ExceptionMessages.TELESALE_NOT_FOUND.createLog("findTeleSale" , teleSalesId )
+                                ExceptionMessages.TELESALE_NOT_FOUND.createLog("findTeleSale", teleSalesId)
                         )
                 );
     }
 
-    private ReporterEntity findReporter(String reporterId){
+    private ReporterEntity findReporter(String reporterId) {
         return reporterRepository.findById(reporterId)
                 .orElseThrow(() ->
                         new NotFoundException(
                                 ExceptionMessages.REPORTER_NOT_FOUND.message(),
-                                ExceptionMessages.REPORTER_NOT_FOUND.createLog("findReporter" , reporterId )
+                                ExceptionMessages.REPORTER_NOT_FOUND.createLog("findReporter", reporterId)
                         )
                 );
+    }
+
+
+    private TaskEntity sameSubjectAndRecently(List<TaskEntity> sameSubjectTask , String subject){
+        if (!sameSubjectTask.isEmpty()) {
+            TaskEntity recentlyCreated = sameSubjectTask.get(0);
+            for (TaskEntity task : sameSubjectTask) {
+                if (task.getAssignee() != null) {
+                    long difference = Math.abs(task.getCreatedAt().getTime() - System.currentTimeMillis());
+                    long minDiff = Math.abs(recentlyCreated.getCreatedAt().getTime() - System.currentTimeMillis());
+                    if (difference < minDiff) {
+                        recentlyCreated = task;
+                    }
+                }
+            }
+            if(recentlyCreated.getAssignee() != null){
+                return  recentlyCreated;
+            }else{
+                return null;
+            }
+        }
+        return null;
     }
 
     public void createTask(TaskReqDto taskReqDto) {
@@ -77,10 +99,30 @@ public class TaskService {
 
         TaskEntity taskEntity = taskMapper.mapToEntity(taskReqDto);
 
-        if(taskReqDto.getAssigneeId() != null){
+        if (taskReqDto.getStatus() == null) {
+            taskEntity.setStatus(TaskStatus.TODO);
+        }
+
+        if (taskReqDto.getAssigneeId() != null) {
             TeleSalesEntity asignee = findTeleSale(taskReqDto.getAssigneeId());
             taskEntity.setAssignee(asignee);
-        }else{
+        } else {
+            // automatically assign task
+
+            // burda eyni subjectde olan ve
+            // en axirinci yaradilib ve assign olunmus taski tapir
+            List<TaskEntity> sameSubjectTask = taskRepository.findAllBySubjectIsIgnoreCase(taskReqDto.getSubject());
+            TaskEntity lastCreatedAndAssignedSameSubject = sameSubjectAndRecently(sameSubjectTask , taskReqDto.getSubject());
+
+
+            if(lastCreatedAndAssignedSameSubject != null){
+                taskEntity.setAssignee(lastCreatedAndAssignedSameSubject.getAssignee());
+            }else{
+                // 2nd case
+                Optional<TeleSalesEntity> findFewestTaskAssignee = teleSalesRepository.findTeleSalesWithFewestTasksExcludingDone();
+                findFewestTaskAssignee.ifPresent(taskEntity::setAssignee);
+                System.out.println(findFewestTaskAssignee.get().getName());
+            }
 
         }
 
@@ -93,13 +135,13 @@ public class TaskService {
         log.info("ACTION.createTask.end reqBody : {}", taskReqDto);
     }
 
-    public void updateTask(String taskId , TaskReqDto taskReqDto){
+    public void updateTask(String taskId, TaskReqDto taskReqDto) {
         log.info("ACTION.updateTask.start reqBody : {}", taskReqDto);
-        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(()->
-                    new NotFoundException(
-                            ExceptionMessages.TASK_NOT_FOUND.message(),
-                            ExceptionMessages.TASK_NOT_FOUND.createLog("findTaskById" , taskId )
-                    )
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() ->
+                new NotFoundException(
+                        ExceptionMessages.TASK_NOT_FOUND.message(),
+                        ExceptionMessages.TASK_NOT_FOUND.createLog("findTaskById", taskId)
+                )
         );
         TaskEntity updatedTaskEntity = taskMapper.mapToEntity(taskReqDto);
         updatedTaskEntity.setId(taskEntity.getId());
@@ -107,7 +149,7 @@ public class TaskService {
 
         TeleSalesEntity assignee = taskEntity.getAssignee();
 
-        if( taskReqDto.getAssigneeId() != null ){
+        if (taskReqDto.getAssigneeId() != null) {
             assignee = findTeleSale(taskReqDto.getAssigneeId());
         }
 
@@ -122,8 +164,8 @@ public class TaskService {
     }
 
     public void deleteTask(String taskId) {
-        log.info("ACTION.deleteTask.start taskId : {}",taskId);
+        log.info("ACTION.deleteTask.start taskId : {}", taskId);
         taskRepository.deleteById(taskId);
-        log.info("ACTION.deleteTask.end taskId : {}",taskId);
+        log.info("ACTION.deleteTask.end taskId : {}", taskId);
     }
 }

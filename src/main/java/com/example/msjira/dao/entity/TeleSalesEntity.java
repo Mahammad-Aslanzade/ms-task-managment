@@ -2,10 +2,7 @@ package com.example.msjira.dao.entity;
 
 import com.example.msjira.enums.TeleSalePosition;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -23,6 +20,7 @@ public class TeleSalesEntity {
     private String id;
     private String name;
     private String surname;
+    private String email;
     @Enumerated(value = EnumType.STRING)
     private TeleSalePosition position;
     private LocalDate birthDate;
