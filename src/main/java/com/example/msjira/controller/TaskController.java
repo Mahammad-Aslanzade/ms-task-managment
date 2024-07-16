@@ -18,27 +18,32 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping
-    public List<TaskDto> getAllTasks(){
+    public List<TaskDto> getAllTasks() {
         return taskService.getAllTasks();
     }
 
     @GetMapping("/{taskId}")
-    public TaskDto getTaskById(@PathVariable String taskId){
+    public TaskDto getTaskById(@PathVariable String taskId) {
         return taskService.getTaskById(taskId);
     }
 
+    @GetMapping("/unassigned")
+    public List<TaskDto> getAllUnAssignedTasks() {
+        return taskService.getAllUnAssignedTasks();
+    }
+
     @PostMapping
-    public void createTask(@Valid @RequestBody TaskReqDto taskReqDto){
+    public void createTask(@Valid @RequestBody TaskReqDto taskReqDto) {
         taskService.createTask(taskReqDto);
     }
 
     @PutMapping("/{taskId}")
-    public void updateTask(@Valid @RequestBody TaskReqDto taskReqDto , @PathVariable String taskId){
-        taskService.updateTask(taskId ,taskReqDto);
+    public void updateTask(@Valid @RequestBody TaskReqDto taskReqDto, @PathVariable String taskId) {
+        taskService.updateTask(taskId, taskReqDto);
     }
 
     @DeleteMapping("/{taskId}")
-    public void deleteTask(@PathVariable String taskId){
+    public void deleteTask(@PathVariable String taskId) {
         taskService.deleteTask(taskId);
     }
 

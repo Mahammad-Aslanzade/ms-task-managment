@@ -17,28 +17,32 @@ public class TeleSalesController {
     private final TeleSalesService teleSalesService;
 
     @GetMapping
-    public List<TeleSaleDto> getAllTeleSales(){
+    public List<TeleSaleDto> getAllTeleSales() {
         return teleSalesService.getAllTeleSales();
     }
 
     @GetMapping("/{teleSaleId}")
-    public TeleSaleDto getTeleSaleById(@PathVariable String teleSaleId){
+    public TeleSaleDto getTeleSaleById(@PathVariable String teleSaleId) {
         return teleSalesService.getTeleSaleById(teleSaleId);
     }
 
     @PostMapping
-    public void createTeleSale(@Valid @RequestBody TeleSaleReqDto teleSaleReqDto){
+    public void createTeleSale(@Valid @RequestBody TeleSaleReqDto teleSaleReqDto) {
         teleSalesService.createTeleSale(teleSaleReqDto);
     }
 
     @PutMapping("/{teleSaleId}")
-    public void updateTeleSale(@PathVariable String teleSaleId ,@Valid @RequestBody TeleSaleReqDto teleSaleReqDto){
-        teleSalesService.updateTeleSale(teleSaleId , teleSaleReqDto);
+    public void updateTeleSale(@PathVariable String teleSaleId, @Valid @RequestBody TeleSaleReqDto teleSaleReqDto) {
+        teleSalesService.updateTeleSale(teleSaleId, teleSaleReqDto);
     }
 
     @DeleteMapping("/{teleSaleId}")
-    public void deleteTeleSale(@PathVariable String teleSaleId){
+    public void deleteTeleSale(@PathVariable String teleSaleId) {
         teleSalesService.deleteTeleSale(teleSaleId);
     }
 
+    @PatchMapping("/{teleSaleId}/tasks/{taskId}/unassign")
+    public void unAssignTask(@PathVariable String teleSaleId, @PathVariable String taskId) {
+        teleSalesService.unAssignTask(teleSaleId,taskId);
+    }
 }
