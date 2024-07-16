@@ -16,7 +16,7 @@ public class EmailService {
     public void postEmail(String adress , String subject , String body){
         log.info("ACTION.postEmail.start adress : {} | subject : {}" , adress , subject);
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("mahammad.code@gmail.com");
+        message.setFrom(System.getenv("mail_username"));
         message.setTo(adress);
         message.setSubject(subject);
         message.setText(body);
