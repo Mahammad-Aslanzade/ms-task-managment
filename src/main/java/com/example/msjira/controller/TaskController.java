@@ -5,6 +5,7 @@ import com.example.msjira.model.task.TaskReqDto;
 import com.example.msjira.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +34,8 @@ public class TaskController {
     }
 
     @PostMapping
-    public void createTask(@Valid @RequestBody TaskReqDto taskReqDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createTask(@Valid @RequestBody TaskReqDto taskReqDto){
         taskService.createTask(taskReqDto);
     }
 
@@ -43,7 +45,8 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    public void deleteTask(@PathVariable String taskId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTask(@PathVariable String taskId){
         taskService.deleteTask(taskId);
     }
 
