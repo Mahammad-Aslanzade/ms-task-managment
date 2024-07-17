@@ -43,6 +43,16 @@ public class TeleSalesService {
         );
     }
 
+    private TaskEntity findTaskEntityById(String taskId) {
+        return taskRepository.findById(taskId).orElseThrow(() ->
+                new NotFoundException(
+                        ExceptionMessages.TASK_NOT_FOUND.message(),
+                        ExceptionMessages.TASK_NOT_FOUND.createLog("findTaskEntityById", taskId)
+                )
+        );
+    }
+
+
     public TeleSaleDto getTeleSaleById(String teleSaleId) {
         log.info("ACTION.getTeleSaleById.start teleSaleId : {} ", teleSaleId);
         TeleSalesEntity teleSalesEntity = findTeleSaleEntityById(teleSaleId);
@@ -68,15 +78,32 @@ public class TeleSalesService {
         log.info("ACTION.updateTeleSale.end teleSaleId : {} , reqBody : {}", teleSaleId, teleSaleReqDto);
     }
 
-    public void deleteTeleSale(String teleSaleId){
+    public void deleteTeleSale(String teleSaleId) {
         log.info("ACTION.deleteTeleSale.start teleSaleId : {}", teleSaleId);
         TeleSalesEntity deletedTeleSale = findTeleSaleEntityById(teleSaleId);
         List<TaskEntity> tasks = taskRepository.findByAssigneeId(teleSaleId);
-        tasks.forEach((t)->{
+        tasks.forEach((t) -> {
             t.setAssignee(null);
         });
         taskRepository.saveAll(tasks);
         teleSalesRepository.delete(deletedTeleSale);
-        log.info("ACTION.deleteTeleSale.end teleSaleId : {}" , teleSaleId);
+        log.info("ACTION.deleteTeleSale.end teleSaleId : {}", teleSaleId);
+    }
+
+    public void unAssignTask(String teleSaleId, String taskId) {
+        log.info("ACTION.unAssignTask.start teleSaleId : {} taskId : {}", teleSaleId, taskId);
+        TeleSalesEntity teleSale = findTeleSaleEntityById(teleSaleId);
+        TaskEntity task = findTaskEntityById(taskId);
+
+        if(teleSalesRepository.existsTaskForTeleSale(teleSaleId,taskId)){
+            task.setAssignee(null);
+            taskRepository.save(task);
+        }else{
+            throw new NotFoundException(
+                    ExceptionMessages.TELESALE_TASK_NOT_FOUND.message(),
+                    ExceptionMessages.TELESALE_TASK_NOT_FOUND.createLog("unAssignTask",taskId)
+                    );
+        }
+        log.info("ACTION.unAssignTask.end teleSaleId : {} taskId : {}", teleSaleId, taskId);
     }
 }

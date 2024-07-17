@@ -3,6 +3,7 @@ package com.example.msjira.dao.repository;
 import com.example.msjira.dao.entity.TeleSalesEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +25,6 @@ public interface TeleSalesRepository extends JpaRepository<TeleSalesEntity, Stri
             nativeQuery = true)
     Optional<TeleSalesEntity> findTeleSalesWithFewestTasksExcludingDone();
 
+    @Query(value = "SELECT COUNT(*) > 0 FROM tele_sales ts JOIN tasks t ON ts.id = t.asignee_id WHERE ts.id = :teleSaleId AND t.id = :taskId", nativeQuery = true)
+    boolean existsTaskForTeleSale(@Param("teleSaleId") String teleSaleId, @Param("taskId") String taskId);
 }

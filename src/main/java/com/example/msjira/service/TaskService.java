@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -167,5 +168,13 @@ public class TaskService {
         log.info("ACTION.deleteTask.start taskId : {}", taskId);
         taskRepository.deleteById(taskId);
         log.info("ACTION.deleteTask.end taskId : {}", taskId);
+    }
+
+    public List<TaskDto> getAllUnAssignedTasks(){
+        log.info("ACTION.getAllUnAssignedTasks.start");
+        List<TaskEntity> taskEntities = taskRepository.findByAssigneeIdIsNull();
+        List<TaskDto> taskDtos = taskEntities.stream().map(taskMapper::mapToDto).toList();
+        log.info("ACTION.getAllUnAssignedTasks.end");
+        return taskDtos;
     }
 }

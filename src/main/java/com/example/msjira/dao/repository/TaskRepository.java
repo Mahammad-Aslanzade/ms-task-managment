@@ -18,4 +18,5 @@ public interface TaskRepository extends JpaRepository<TaskEntity , String> {
 
     List<TaskEntity> findByDeadlineBeforeAndStatusIsNot(Date date , TaskStatus taskStatus);
 
+    List<TaskEntity> findByAssigneeIdIsNull();
 }

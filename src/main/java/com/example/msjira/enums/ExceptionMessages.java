@@ -1,7 +1,7 @@
 package com.example.msjira.enums;
 
 public enum ExceptionMessages {
-    TASK_NOT_FOUND , TELESALE_NOT_FOUND , REPORTER_NOT_FOUND;
+    TASK_NOT_FOUND , TELESALE_NOT_FOUND , REPORTER_NOT_FOUND,TELESALE_TASK_NOT_FOUND;
 
     public String message(){
         return this.toString();
