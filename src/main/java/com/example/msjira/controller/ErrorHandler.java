@@ -1,7 +1,8 @@
 package com.example.msjira.controller;
 
+import com.example.msjira.exceptions.CantModifyException;
 import com.example.msjira.exceptions.NotFoundException;
-import com.example.msjira.model.exceptions.NotFoundDto;
+import com.example.msjira.model.exceptions.ExceptionDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,16 @@ public class ErrorHandler {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public NotFoundDto handleNotFound(NotFoundException exception) {
+    public ExceptionDto handleNotFound(NotFoundException exception) {
         log.error(exception.getLogMessage());
-        return new NotFoundDto(exception.getMessage());
+        return new ExceptionDto(exception.getMessage());
+    }
+
+    @ExceptionHandler(CantModifyException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionDto handleModify(CantModifyException exception) {
+        log.error(exception.getLogMessage());
+        return new ExceptionDto(exception.getMessage());
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.msjira.service;
 
+import com.example.msjira.config.RabbitMQConfig;
 import com.example.msjira.dao.entity.ReporterEntity;
 import com.example.msjira.dao.entity.TaskEntity;
 import com.example.msjira.dao.entity.TeleSalesEntity;
@@ -8,12 +9,16 @@ import com.example.msjira.dao.repository.TaskRepository;
 import com.example.msjira.dao.repository.TeleSalesRepository;
 import com.example.msjira.enums.ExceptionMessages;
 import com.example.msjira.enums.TaskStatus;
+import com.example.msjira.exceptions.CantModifyException;
 import com.example.msjira.exceptions.NotFoundException;
 import com.example.msjira.mapper.TaskMapper;
 import com.example.msjira.model.task.TaskDto;
 import com.example.msjira.model.task.TaskReqDto;
+import com.example.msjira.model.task.TaskShortDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -31,6 +36,8 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ReporterRepository reporterRepository;
     private final TeleSalesRepository teleSalesRepository;
+    private final RabbitTemplate rabbitTemplate;
+    private final AmqpTemplate template;
 
     public List<TaskDto> getAllTasks() {
         log.info("ACTION.getAllTasks.start");
@@ -42,14 +49,19 @@ public class TaskService {
 
     public TaskDto getTaskById(String taskId) {
         log.info("ACTION.getTaskById.start taskId : {}", taskId);
+        TaskEntity taskEntity = findTask(taskId);
+        TaskDto taskDto = taskMapper.mapToDto(taskEntity);
+        log.info("ACTION.getTaskById.start taskId : {}", taskId);
+        return taskDto;
+    }
+
+    private TaskEntity findTask(String taskId) {
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() ->
                 new NotFoundException(
                         ExceptionMessages.TASK_NOT_FOUND.message(),
                         ExceptionMessages.TASK_NOT_FOUND.createLog("findTaskById", taskId)
                 ));
-        TaskDto taskDto = taskMapper.mapToDto(taskEntity);
-        log.info("ACTION.getTaskById.start taskId : {}", taskId);
-        return taskDto;
+        return taskEntity;
     }
 
     private TeleSalesEntity findTeleSale(String teleSalesId) {
@@ -176,5 +188,21 @@ public class TaskService {
         List<TaskDto> taskDtos = taskEntities.stream().map(taskMapper::mapToDto).toList();
         log.info("ACTION.getAllUnAssignedTasks.end");
         return taskDtos;
+    }
+
+    public void doneTask(String taskId){
+        log.info("ACTION.doneTask.start taskId : {}", taskId);
+        TaskEntity taskEntity = findTask(taskId);
+        if(taskEntity.getStatus().equals(TaskStatus.EXPIRED)){
+            throw new CantModifyException(
+                    ExceptionMessages.CANT_MODIFY.toString(),
+                    ExceptionMessages.CANT_MODIFY.createLog("doneTask", taskId)
+            );
+        }
+        taskEntity.setStatus(TaskStatus.DONE);
+        taskRepository.save(taskEntity);
+        TaskShortDto taskShortDto = taskMapper.mapToShortDto(taskEntity);
+        template.convertAndSend(RabbitMQConfig.EXCHANGE,RabbitMQConfig.ROUTING_KEY,taskShortDto);
+        log.info("ACTION.doneTask.end taskId : {}", taskId);
     }
 }

@@ -50,4 +50,8 @@ public class TaskController {
         taskService.deleteTask(taskId);
     }
 
+    @PatchMapping("/{taskId}/done")
+    public void doneTask(@PathVariable String taskId){
+        taskService.doneTask(taskId);
+    }
 }
