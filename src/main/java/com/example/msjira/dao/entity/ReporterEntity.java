@@ -24,6 +24,7 @@ public class ReporterEntity {
     private String surname;
     private LocalDate birthDate;
     private String image;
+    private String email;
 
     @OneToMany(mappedBy = "reporter")
     private Set<TaskEntity> task;

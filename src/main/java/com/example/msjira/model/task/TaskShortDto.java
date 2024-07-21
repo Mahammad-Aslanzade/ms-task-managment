@@ -15,6 +15,7 @@ import java.util.Date;
 public class TaskShortDto {
     private String id;
     private TeleSalesWithoutTaskDto assignee;
+    private ReporterWithoutTaskDto reporter;
     private Date createdAt;
     private Date updatedAt;
     private Date deadline;

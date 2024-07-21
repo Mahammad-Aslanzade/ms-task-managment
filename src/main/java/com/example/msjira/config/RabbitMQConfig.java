@@ -1,5 +1,6 @@
 package com.example.msjira.config;
 
+import lombok.Getter;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,12 +11,13 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Getter
 @Configuration
 public class RabbitMQConfig {
 
-   public static final String QUEUEU= "${queue-name}";
-   public static final String EXCHANGE= "${test-exchange}";
-   public static final String ROUTING_KEY= "${routing-key}  ";
+   private final String QUEUEU= "done-tasks";
+   private final String EXCHANGE= "exchange-tasks";
+   private final String ROUTING_KEY= "routing-tasks";
 
    @Bean
    public Queue queue(){

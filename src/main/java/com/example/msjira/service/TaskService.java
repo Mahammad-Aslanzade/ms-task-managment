@@ -38,6 +38,7 @@ public class TaskService {
     private final TeleSalesRepository teleSalesRepository;
     private final RabbitTemplate rabbitTemplate;
     private final AmqpTemplate template;
+    private final RabbitMQConfig rabbitMQConfig;
 
     public List<TaskDto> getAllTasks() {
         log.info("ACTION.getAllTasks.start");
@@ -198,11 +199,16 @@ public class TaskService {
                     ExceptionMessages.CANT_MODIFY.toString(),
                     ExceptionMessages.CANT_MODIFY.createLog("doneTask", taskId)
             );
+        }else if (taskEntity.getStatus().equals(TaskStatus.DONE)){
+            throw new CantModifyException(
+                    ExceptionMessages.CANT_MODIFY.toString(),
+                    ExceptionMessages.CANT_MODIFY.createLog("doneTask", taskId)
+            );
         }
         taskEntity.setStatus(TaskStatus.DONE);
         taskRepository.save(taskEntity);
         TaskShortDto taskShortDto = taskMapper.mapToShortDto(taskEntity);
-        template.convertAndSend(RabbitMQConfig.EXCHANGE,RabbitMQConfig.ROUTING_KEY,taskShortDto);
+        template.convertAndSend(rabbitMQConfig.getEXCHANGE(),rabbitMQConfig.getROUTING_KEY(),taskShortDto);
         log.info("ACTION.doneTask.end taskId : {}", taskId);
     }
 }

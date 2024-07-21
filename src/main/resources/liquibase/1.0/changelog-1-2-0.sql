@@ -1,0 +1,2 @@
+ALTER TABLE reporters
+    ADD COLUMN email VARCHAR(100);
