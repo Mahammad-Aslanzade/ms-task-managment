@@ -27,7 +27,7 @@ public class TeleSalesController {
     }
 
     @PostMapping
-    public void createTeleSale(@Valid @RequestBody TeleSaleReqDto teleSaleReqDto) {
+    public void createTeleSale(@Valid @ModelAttribute TeleSaleReqDto teleSaleReqDto) {
         teleSalesService.createTeleSale(teleSaleReqDto);
     }
 

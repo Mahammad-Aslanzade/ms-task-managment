@@ -13,6 +13,21 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq  # Persist RabbitMQ data
 
+  postgres:
+    image: postgres:latest
+    hostname: postgres
+    ports:
+      - "5432:5432"  # PostgreSQL port
+    environment:
+      POSTGRES_USER: postgres  # Change this
+      POSTGRES_PASSWORD: baloghlan1234  # Change this
+      POSTGRES_DB: task_managment  # Change this (optional)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
+
 volumes:
   rabbitmq_data:
+    driver: local
+
+  postgres_data:
     driver: local
