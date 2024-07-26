@@ -6,6 +6,7 @@ import com.example.msjira.service.TeleSalesService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,8 +28,12 @@ public class TeleSalesController {
     }
 
     @PostMapping
-    public void createTeleSale(@Valid @ModelAttribute TeleSaleReqDto teleSaleReqDto) {
-        teleSalesService.createTeleSale(teleSaleReqDto);
+    public void createTeleSale(
+            @Valid
+            @RequestPart(name = "telesaleInfo") TeleSaleReqDto teleSaleReqDto,
+            @RequestPart(name = "image") MultipartFile image
+    ) {
+        teleSalesService.createTeleSale(teleSaleReqDto,image);
     }
 
     @PutMapping("/{teleSaleId}")

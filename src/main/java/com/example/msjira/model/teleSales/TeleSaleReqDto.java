@@ -20,5 +20,4 @@ public class TeleSaleReqDto {
     private String email;
     private TeleSalePosition position;
     private LocalDate birthDate;
-    private MultipartFile image;
 }

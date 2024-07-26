@@ -12,8 +12,10 @@ import com.example.msjira.model.teleSales.TeleSaleReqDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.File;
 import java.util.List;
 
 @Service
@@ -24,6 +26,7 @@ public class TeleSalesService {
     private final TeleSalesRepository teleSalesRepository;
     private final TeleSalesMapper teleSalesMapper;
     private final TaskRepository taskRepository;
+    private final ImageService imageService;
 
 
     public List<TeleSaleDto> getAllTeleSales() {
@@ -61,9 +64,19 @@ public class TeleSalesService {
         return teleSaleDto;
     }
 
-    public void createTeleSale(TeleSaleReqDto teleSaleReqDto) {
+    public void createTeleSale(TeleSaleReqDto teleSaleReqDto, MultipartFile image) {
         log.info("ACTION.createTeleSale.start teleSaleDto : {} ", teleSaleReqDto);
         TeleSalesEntity teleSalesEntity = teleSalesMapper.mapToEntity(teleSaleReqDto);
+
+        String locationPath = System.getProperty("user.dir")+"/uploads/telesale";
+        File file = new File(locationPath);
+
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        String imagePath = imageService.createAndReturnPath(image,"/telesale");
+        teleSalesEntity.setImage(imagePath);
+
         teleSalesRepository.save(teleSalesEntity);
         log.info("ACTION.createTeleSale.end teleSaleDto : {} ", teleSaleReqDto);
     }
